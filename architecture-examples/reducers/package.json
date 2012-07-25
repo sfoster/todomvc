@@ -1,0 +1,23 @@
+{
+  "name": "TodoMVC",
+  "id": "todo-mvc",
+  "version": "0.0.1",
+  "description": "TodoMVC example using reducers",
+  "keywords": [ "reducers", "todo", "mvc", "example" ],
+  "author": "Irakli Gozalishvili <rfobic@gmail.com> (http://jeditoolkit.com)",
+  "homepage": "https://github.com/addyosmani/todomvc",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/addyosmani/todomvc.git",
+    "web": "https://github.com/addyosmani/todomvc"
+  },
+  "scripts": {
+    "browserify": "browserify --watch --debug --entry ./main.js --outfile ./js/app.js"
+  },
+  "bugs": {
+    "url": "https://github.com/addyosmani/todomvc/issues/"
+  },
+  "dependencies": {
+    "reducers": "git://github.com/gozala/reducers.git#experiment/browser"
+  }
+}
