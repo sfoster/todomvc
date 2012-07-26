@@ -18,6 +18,6 @@
     "url": "https://github.com/addyosmani/todomvc/issues/"
   },
   "dependencies": {
-    "reducers": "git://github.com/gozala/reducers.git#experiment/browser"
+    "reducers": "git://github.com/Gozala/reducers.git#experiment/browser"
   }
 }
