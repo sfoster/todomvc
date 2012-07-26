@@ -106,6 +106,13 @@ each(enters, function (event) {
   event.target.value = '';
 });
 
+// Update the item count for each item entered.
+reduce(enters, function (count) {
+  count = count + 1;
+  updateCount(count);
+  return count;
+}, 0);
+
 // Mouse Mover
 // -----------------------------------------------------------------------------
 
