@@ -113,3 +113,17 @@ each(enters, function (event) {
   event.target.value = '';
 });
 
+function getTogglerID(element) {
+  return element.parentElement.parentElement.getAttribute('id')
+}
+var toggleEvents = open(document.documentElement, 'change')
+var toggleTargets = map(toggleEvents, function(event) { return event.target })
+var toggleUpdates = map(toggleTargets, function(target) {
+  return {
+    id: getTogglerID(target),
+    done: target.checked
+  }
+})
+each(toggleUpdates, function(update) {
+  document.getElementById(update.id).className = update.done ? 'completed' : ''
+})
