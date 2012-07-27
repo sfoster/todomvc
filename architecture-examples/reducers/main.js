@@ -9,7 +9,8 @@
 var open = require('reducers/dom').open;
 var core = require('reducers/core'),
     filter = core.filter,
-    map = core.map;
+    map = core.map,
+    reductions = core.reductions;
 
 var reduce = require('reducers/accumulator').reduce;
 
@@ -93,6 +94,9 @@ var newTodos = map(validTitles, function (title) {
 });
 
 var newTodoEls = map(newTodos, createTodo);
+var count = reductions(newTodos, function(x) {
+  return x + 1
+}, 0);
 
 var todosEl = document.getElementById('todo-list');
 
@@ -101,14 +105,11 @@ each(newTodoEls, function (todoEl) {
   prepend(todosEl, todoEl);
 });
 
+// Update the item count for each item entered.
+each(count, updateCount)
+
 // Clear each value after it's processed.
 each(enters, function (event) {
   event.target.value = '';
 });
 
-// Update the item count for each item entered.
-reduce(enters, function (count) {
-  count = count + 1;
-  updateCount(count);
-  return count;
-}, 0);
