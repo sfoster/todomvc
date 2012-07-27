@@ -112,23 +112,3 @@ reduce(enters, function (count) {
   updateCount(count);
   return count;
 }, 0);
-
-// Mouse Mover
-// -----------------------------------------------------------------------------
-
-var moves = open(docEl, 'mousemove');
-
-var positions = map(moves, function(event) {
-  return { x: event.clientX, y: event.clientY };
-});
-
-var element = document.createElement('span');
-element.textContent = 'hello world 3';
-element.style.position = 'absolute';
-element.style.top = 0;
-document.body.appendChild(element);
-
-reduce(positions, function(result, position) {
-  element.style.top = position.y + 'px'
-  element.style.left = position.x + 'px'
-});
