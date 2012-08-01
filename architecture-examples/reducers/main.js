@@ -69,7 +69,7 @@ var updateCount = function (count) {
   document.getElementById('todo-count').textContent = count;
 }
 
-// Create new TODO
+// Enter new Todos
 // -----------------------------------------------------------------------------
 
 var docEl = document.documentElement;
@@ -113,6 +113,9 @@ each(enters, function (event) {
   event.target.value = '';
 });
 
+// Update Todos
+// -----------------------------------------------------------------------------
+
 function getTogglerID(element) {
   return element.parentElement.parentElement.getAttribute('id')
 }
@@ -123,7 +126,8 @@ var toggleUpdates = map(toggleTargets, function(target) {
     id: getTogglerID(target),
     done: target.checked
   }
-})
+});
+
 each(toggleUpdates, function(update) {
   document.getElementById(update.id).className = update.done ? 'completed' : ''
-})
+});
