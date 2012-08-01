@@ -4,9 +4,9 @@ Reducers is a reactive programming approach to creating applications.
 
 Reducers allow you to process streams of data in real time by using and transforming processing functions. You don't have to create a bunch of interim array containers for that data, because your functions react to it *as it streams in*.
 
-There are a bunch of happy side-effects to this approach as well:
+There are a bunch of happy side-effects to this approach:
 
-* You don't need to do data-binding. Since you're mapping and filtering from the same live stream, everything stays in sync automatically.
+* You don't need to do data-binding, ever. Since you're mapping and filtering from the same live stream, everything stays in sync automatically.
 * You don't need to allocate memory to store your data if you don't want to. Your program reacts to the data as it streams in.
 
 ## Install
@@ -18,13 +18,21 @@ cd todomvc/architecture-examples/reducers
 npm install
 ```
 
-You'll also need [Browserify][].
+You'll also need [Browserify][browserify].
 
 ```sh
 npm install -g browserify
 ```
 
 ## Usage
+
+If you want to hack on the Todo app locally, you'll probably want to run a local server so you can preview your work. On OSX it's pretty easy, `cd` into the `todomvc` folder and:
+
+```sh
+python -m SimpleHTTPServer
+```
+
+After that, you'll need to run [Browserify][browserify], since we're using NodeJS-style CommonJS modules:
 
 ```sh
 cd todomvc/architecture-examples/reducers
