@@ -17,36 +17,36 @@ var reduce = require('reducers/accumulator').reduce;
 // Helper Functions
 // -----------------------------------------------------------------------------
 
-var each = function (source, f) {
+function each(source, f) {
   reduce(source, function (_, item) {
     f(item);
   });
   return null;
-};
+}
 
 // Generate a unique client ID.
-var cid = function () {
+function cid() {
   return (Date.now()).toString(16);
-};
+}
 
-var isTruthy = function (thing) {
+function isTruthy(thing) {
   return !!thing;
-};
+}
 
 // Mutates an element by capturing, removing and returning it's value.
-var removeValue = function (el) {
-  var value = el.value;
-  el.value = '';
+function removeValue(element) {
+  var value = element.value;
+  element.value = '';
   return value;
-};
+}
 
-var isEnterKey = function (event) {
+function isEnterKey(event) {
   return event.keyCode === 13;
-};
+}
 
 // Create a new Todo element from a template by passing an
 // object as a data model.
-var createTodo = function (model) {
+function createTodo(model) {
   var liEl = document.createElement('li');
   liEl.setAttribute('id', model.cid);
   liEl.innerHTML = '<div class="view"><input class="toggle" type="checkbox"><label>' +
@@ -60,13 +60,25 @@ var createTodo = function (model) {
 
 // Prepend an element to the top of a parent element.
 // This helper could be replaced if you decide to use jQuery.
-var prepend = function (parentEl, childEl) {
+function prepend(parentEl, childEl) {
   var firstChild = parentEl.firstChild;
   parentEl.insertBefore(childEl, firstChild);
 }
 
-var updateCount = function (count) {
+function remove(element) {
+  return element.parentElement.removeChild(element);
+}
+
+function hasClass(element, classname) {
+  return element.className.indexOf(classname) !== -1;
+}
+
+function updateCount(count) {
   document.getElementById('todo-count').textContent = count;
+}
+
+function getEventTarget(event) {
+  return event.target;
 }
 
 // Enter new Todos
@@ -120,7 +132,7 @@ function getTogglerID(element) {
   return element.parentElement.parentElement.getAttribute('id')
 }
 var toggleEvents = open(document.documentElement, 'change')
-var toggleTargets = map(toggleEvents, function(event) { return event.target })
+var toggleTargets = map(toggleEvents, getEventTarget)
 var toggleUpdates = map(toggleTargets, function(target) {
   return {
     id: getTogglerID(target),
@@ -131,3 +143,16 @@ var toggleUpdates = map(toggleTargets, function(target) {
 each(toggleUpdates, function(update) {
   document.getElementById(update.id).className = update.done ? 'completed' : ''
 });
+
+// Exit (remove) old Todos
+// -----------------------------------------------------------------------------
+
+var clickEvents = open(document.documentElement, 'click');
+var clickedElements = map(clickEvents, getEventTarget);
+var exitButtons = filter(clickedElements, function (element) {
+  return hasClass(element, 'destroy');
+});
+var exitingElements = map(exitButtons, function (element) {
+  return element.parentElement.parentElement;
+});
+each(exitingElements, remove);
