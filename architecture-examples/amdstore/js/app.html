@@ -1,0 +1,55 @@
+<section>
+  <!-- 
+    this is the main app template, it is the initial rendering of the view to the app's model, as coupled by the app controller
+
+    view:template is 1:1, each view has one template and one viewmodel (and entity kind of object that aggregates all relevant properties)
+
+    template will be paired with a context (viewmodel) and populated with values
+    then rendered out to DOM where it can be post-processed
+    
+    values remain live, so changes in the underlying model get reflected automatically into the view
+    our lists are made from observable collections - live query results
+    our values are model properties, where changes trigger event via the setter
+  -->
+	<header id="header">
+	<h1>todos</h1>
+        <input id="new-todo" data-attach-event="onkeypress:onKeyPress" placeholder="What needs to be done?" type="text" autofocus>
+        <span class="ui-tooltip-top" style="display:none;">Press Enter to save this task</span>
+    </header>
+
+    <section id="main">
+	    <input id="toggle-all" data-attach-point="mark_all" data-attach-event="onclick:onMarkAll" type="checkbox">
+	    <label for="toggle-all">Mark all as complete</label>
+      <ul id="todo-list" data-attach-point="todo_list">
+        {{#todos}}
+          <li>{{text}}</li>
+        {{/todos}}
+	    </ul>
+	</section>
+
+    <footer id="footer" data-attach-point="todo_stats">
+        <span id="todo-count">
+            <strong>
+                <span data-type="dojox.mvc.Output" data-props="ref: this.model.incomplete" class="number"></span>
+            </strong>
+            <span class="word">item<span class="plural">s</span></span> left.
+        </span>
+	    <!-- Remove this if you don't implement routing -->
+		<ul id="filters">
+		    <li>
+			    <a class="selected" href="#/">All</a>
+		    </li>
+			<li>
+			    <a href="#/active">Active</a>
+		    </li>
+			<li>
+				<a href="#/completed">Completed</a>
+			</li>
+	    </ul>
+        <button id="clear-completed" data-attach-event="onclick:removeCompletedItems">
+            Clear completed (
+            <span class="number-done" data-type="dojox.mvc.Output" data-props="ref: this.model.complete" ></span>
+            )
+        </button>
+    </footer>
+</section>
