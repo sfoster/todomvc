@@ -26,8 +26,15 @@
 				  'dollar': './vendor/zepto',
 				  'store': './vendor/store',
 				  'handlebars': './vendor/handlebars',
-				  'text': './vendor/text'
-				}
+				  'text': './vendor/text',
+				  'util': './vendor/lodash'
+				},
+				shim: {
+				  'handlebars': {
+				    deps: [],
+				    exports: 'Handlebars'
+				  }
+				} 
 			}
 		);
 		require(['app']);
