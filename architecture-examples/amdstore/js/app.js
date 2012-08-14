@@ -90,16 +90,26 @@ define([
             $el.html( html );
           },
           clear: function(options){
-            if(!options) options = {};
             var $el = $(this.el), 
                 len = $el.children().size();
-            var fromIdx = options.from || 0, 
-                toIdx = options.to || len; 
+            var fromIdx = isDefined(fromIdx) ? fromIdx:  0, 
+                toIdx = isDefined(toIdx) ? toIdx : len;
                 
             console.log(this.el, "view clear from %s, to %s of children: %s", fromIdx, toIdx, len);
+            console.log("$el.children is: ", $el.children().length);
             $el.children().slice(fromIdx, toIdx).remove();
+            console.log("sliced, $el.children is: ", $el.children().length);
           }
         };
+        
+        $(this.mainView.el).delegate('#new-todo', 'keypress', function(evt){
+          console.log("keypress: ", evt.which);
+          if(evt.which == 13) {
+            console.log("adding new store item: ", evt.target.value);
+            self.store.add({ title: evt.target.value });
+            evt.target.value = '';
+          }          
+        });
         
         this.listView = util.extend(Object.create(this.mainView), {
           el: '#todo-list',
@@ -111,6 +121,9 @@ define([
               .map(renderItem)
               .map(insertNodes);
             return this;
+          },
+          add: function(item, atIdx){
+            insertNodes(renderItem(item));
           }
         });
 
@@ -150,9 +163,7 @@ define([
         console.log("in intializae, mapping rows, ", rows.length);
         rows.map(decorateWithIndex).map(function(item, idx){
           console.log("calling render with item: ", item, idx);
-          self.listView.render( [item], {
-           from: idx 
-          });
+          self.listView.add(item);
         });
 
       },
@@ -208,6 +219,7 @@ define([
        * set inline edit box to true.
        */ 
       onEdit: function (event) {
+        console.log("onEdit");
         // TODO
       },
 
