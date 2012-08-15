@@ -112,12 +112,23 @@ define([
       },
       fetchTodos: function(rows){
         var self = this;
-        
+        var proto = { editMode: false, completed: false };
+        function item(vm){
+          util.defaults(vm, proto);
+          console.log("decorate item, typeof editMode: ", typeof vm.editMode);
+          vm.editMode =   ko.observable(vm.editMode || false);
+          vm.completed =  ko.observable(vm.completed || false);
+          vm.title =  ko.observable(vm.title || '');
+          console.log("decorate item, typeof editMode: ", typeof vm.editMode);
+          return vm;
+        }
+
         // we return the observable array, but call splice on it with the results when the come back
         // as its observable, it should result in updates to all listeners
         Promise.when(this.store.query({ type: 'todo' }), function(results){
           console.log("query callback, got results: ", results);
-          rows.splice.apply(rows, [0, rows.length].concat(results) );
+          var len = ('function' == typeof rows) ? rows().length : rows.length;
+          rows.splice.apply(rows, [0, len].concat(results.map(item)) );
         });
 
         return rows; 
@@ -173,9 +184,18 @@ define([
        * Whenever the user double clicks the item label, 
        * set inline edit box to true.
        */ 
-      onEdit: function (event) {
-        console.log("onEdit");
-        // TODO
+      onEdit: function (vm, evt) {
+        vm.editMode(true);
+        console.log("onEdit, item now has editMode", vm.editMode());
+        return true;
+      },
+      onBlur: function(vm, evt) {
+        var newVal = evt.target.value;
+        if(newVal !== vm.title()) {
+          vm.title(newVal);
+        }
+        vm.editMode(false);
+        return true;
       },
 
       /**
@@ -199,10 +219,11 @@ define([
     
     var todoStore = new Store({
       // config store
+      
       data: [
-        { id: 'item0', title: 'First Todo', completed: false, type: 'todo' }, 
-        { id: 'item1', title: '2nd Todo', completed: false, type: 'todo' },
-        { id: 'item3', title: 'Not a  Todo', completed: false, type: 'foo' }
+        { id: 'item0', title: 'First Todo', type: 'todo' }, 
+        { id: 'item1', title: '2nd Todo', type: 'todo' },
+        { id: 'item3', title: 'Not a  Todo', type: 'foo' }
       ]
     });
     

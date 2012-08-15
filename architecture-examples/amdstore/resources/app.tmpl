@@ -22,12 +22,14 @@
 	    <label for="toggle-all">Mark all as complete</label>
 	    
       <ul id="todo-list" data-bind="foreach: todos">
-        <li>
-          <input class="toggle" type="checkbox" data-bind="attr: { checked: completed }"/>
-          <label data-bind="text: title"></label>
-          <button class="destroy"></button>
-        	<!-- input class="edit" type="text" value="<%= title %>" /-->
-        </li>
+        <li data-bind="css: { editing: editMode() }">
+          <div class="view">
+            <input class="toggle" type="checkbox" data-bind="attr: { checked: completed }"/>
+            <label data-bind="text: title, event: {dblclick: $root.onEdit}"></label>
+            <button class="destroy"></button>
+          </div>
+          <input class="edit" type="text" data-bind="value: title, event: { blur: $root.onBlur }"/>
+      	</li>
 	    </ul>
 	</section>
 
