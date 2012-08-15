@@ -13,22 +13,22 @@
   -->
 	<header id="header">
 	<h1>todos</h1>
-        <input id="new-todo" data-attach-event="onkeypress:onKeyPress" placeholder="What needs to be done?" type="text" autofocus>
+        <input id="new-todo" data-bind="event: { keypress: onKeyPress }" placeholder="What needs to be done?" type="text" autofocus>
         <span class="ui-tooltip-top" style="display:none;">Press Enter to save this task</span>
     </header>
 
     <section id="main">
-	    <input id="toggle-all" data-attach-point="mark_all" data-attach-event="onclick:onMarkAll" type="checkbox">
+	    <input id="toggle-all" data-bind="click: onMarkAll" type="checkbox">
 	    <label for="toggle-all">Mark all as complete</label>
-      <ul id="todo-list" data-attach-point="todo_list">
-          <li>Loading..</li>
+      <ul id="todo-list" data-bind="foreach: todos">
+          <li data-itemid="attr: id, text: title"></li>
 	    </ul>
 	</section>
 
     <footer id="footer" data-attach-point="todo_stats">
         <span id="todo-count">
             <strong>
-                <span data-type="dojox.mvc.Output" data-props="ref: this.model.incomplete" class="number"></span>
+                <span data-bind="text: todos.total" class="number"></span>
             </strong>
             <span class="word">item<span class="plural">s</span></span> left.
         </span>
@@ -44,7 +44,7 @@
 				<a href="#/completed">Completed</a>
 			</li>
 	    </ul>
-        <button id="clear-completed" data-attach-event="onclick:removeCompletedItems">
+        <button id="clear-completed" data-bind="click: removeCompletedItems">
             Clear completed (
             <span class="number-done" data-type="dojox.mvc.Output" data-props="ref: this.model.complete" ></span>
             )

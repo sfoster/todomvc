@@ -1,6 +1,6 @@
 define([
-  "dollar", "util", "store/LocalStorage", "store/Observable", "handlebars", "text!../resources/app.tmpl", "text!../resources/item.tmpl"
-], function($, util, Store, StoreObservable, Handlebars, mainTemplate, itemTemplate) {
+  "dollar", "util", "store/LocalStorage", "store/Observable", "knockout", "text!../resources/app.tmpl", "text!../resources/item.tmpl"
+], function($, util, Store, StoreObservable, ko, mainTemplate, itemTemplate) {
 
     //  $(elements).delegate(selector, events, data, handler);  // jQuery 1.4.3+
     //  $(elements).on(events, selector, data, handler);        // jQuery 1.7+
@@ -46,8 +46,6 @@ define([
     // -----------------
     // assemble the pieces for the app
     //
-    mainTemplate = Handlebars.compile(mainTemplate);
-    itemTemplate = Handlebars.compile(itemTemplate);
 
     function renderItem(data, idx){
       var context = Object.create(data);
@@ -77,58 +75,6 @@ define([
 
       initialize: function(){
         var self = this;
-        
-        // render
-        this.mainView = {
-          el: '#todoapp',
-          template: mainTemplate,
-          render: function(context, options){
-            this.clear(options);
-            var $el = $(this.el);
-            var html = this.template(context || {});
-            console.log("Insert markup into: ", $el);
-            $el.html( html );
-          },
-          clear: function(options){
-            var $el = $(this.el), 
-                len = $el.children().size();
-            var fromIdx = isDefined(fromIdx) ? fromIdx:  0, 
-                toIdx = isDefined(toIdx) ? toIdx : len;
-                
-            console.log(this.el, "view clear from %s, to %s of children: %s", fromIdx, toIdx, len);
-            console.log("$el.children is: ", $el.children().length);
-            $el.children().slice(fromIdx, toIdx).remove();
-            console.log("sliced, $el.children is: ", $el.children().length);
-          }
-        };
-        
-        $(this.mainView.el).delegate('#new-todo', 'keypress', function(evt){
-          console.log("keypress: ", evt.which);
-          if(evt.which == 13) {
-            console.log("adding new store item: ", evt.target.value);
-            self.store.add({ title: evt.target.value });
-            evt.target.value = '';
-          }          
-        });
-        
-        this.listView = util.extend(Object.create(this.mainView), {
-          el: '#todo-list',
-          render: function(items, options){
-            items = items || [];
-            console.log("render items: ", items);
-            this.clear(options);
-            items
-              .map(renderItem)
-              .map(insertNodes);
-            return this;
-          },
-          add: function(item, atIdx){
-            insertNodes(renderItem(item));
-          }
-        });
-
-        // TODO
-        //  bind key events
 
         /**
          * Hook into unload event to trigger persisting
@@ -139,14 +85,23 @@ define([
             if(self.store.commit) self.store.commit();
         };
 
-        // TODO: Connect to changes to the URI hash
+        return this;
+      },
+      applyBindings: function(){
+        var selfNode = $(this.el)[0];
+        
+        console.log("Applying bindings in : ", selfNode);
+        ko.applyBindings(this, selfNode);
+        console.log("/Applying bindings");
 
         return this;
       },
       setStore: function(store){
         store = this.store = StoreObservable(store);
         var self = this;
-        var rows = this.rows = store.query(null);
+        var rows = this.todos = [{ id: 'item0', title: 'First Todo'}, { id: 'item1', title: '2nd Todo'}];
+        return this;
+        //store.query(null);
         // initial render, move/bind to view
         
         //  watch for changes to the store that match our query
@@ -160,49 +115,49 @@ define([
           self.listView.render( changes.map(decorateWithIndex), options );
 
         }, true);
-        console.log("in intializae, mapping rows, ", rows.length);
+        console.log("in setStore, mapping rows, ", rows.length);
         rows.map(decorateWithIndex).map(function(item, idx){
           console.log("calling render with item: ", item, idx);
           self.listView.add(item);
         });
-
+        return this;
+      },
+      onKeyPress: function(viewmodel, evt){
+        var self = this;
+        if(evt.which == 13) {
+          console.log("adding new store item: ", evt.target.value);
+          self.store.add({ title: evt.target.value });
+          evt.target.value = '';
+        }
+        return true; // allow default action
       },
       onResultsChange: function(item, removedFrom, insertedInto){
-        console.log("results observer, removed from: %s, inserted into: %s", removedFrom, insertedInto);
-        var arr = [];
-        
-        if(isDefined(insertedInto) && insertedInto > -1) {
-          // item was added
-          arr = new Array(insertedInto); // sparse array
-          arr.push(item);                    // index 'zeroed' at the store results index
-          // arr
-          //   .map(decorateWithIndex)
-          //   .map(renderItem)
-          //   .map(insertNodes);
-        } else if(isDefined(removedFrom) && removedFrom > -1){
-          console.log("item was removed, at index: ", removedFrom, " of ", results.length);
-          // remove everything after and including the affected item
-
-          arr = new Array(removedFrom); // sparse arrqy
-          // don't touch elements not needing changes
-          var dirtyitems= results.slice(removedFrom);
-          arr.push.apply(arr, dirtyitems);
-        }
-        return arr;
+        // console.log("results observer, removed from: %s, inserted into: %s", removedFrom, insertedInto);
+        // var arr = [];
+        // 
+        // if(isDefined(insertedInto) && insertedInto > -1) {
+        //   // item was added
+        //   arr = new Array(insertedInto); // sparse array
+        //   arr.push(item);                    // index 'zeroed' at the store results index
+        //   // arr
+        //   //   .map(decorateWithIndex)
+        //   //   .map(renderItem)
+        //   //   .map(insertNodes);
+        // } else if(isDefined(removedFrom) && removedFrom > -1){
+        //   console.log("item was removed, at index: ", removedFrom, " of ", results.length);
+        //   // remove everything after and including the affected item
+        // 
+        //   arr = new Array(removedFrom); // sparse arrqy
+        //   // don't touch elements not needing changes
+        //   var dirtyitems= results.slice(removedFrom);
+        //   arr.push.apply(arr, dirtyitems);
+        // }
+        // return arr;
       },
       
       render: function(){
         var self = this;
-        if(this.mainView) this.mainView.render();
-        if(this.listView) this.listView.render();
-        // TODO: tear-down handlers before re-rendering
-        $(this.mainView.el)
-          .delegate(".destroy", "click", function(){ self.onRemove(); })
-          .delegate(".view", "dblclick", function(){ self.onEdit(); })
-        ;
-
-        // this.onItemStatusUpdate();
-
+        $(this.el).html(mainTemplate);
         return this;
       },
       /**
@@ -231,6 +186,14 @@ define([
        */ 
       onHashChange: function (hash) {
         // TODO
+      },
+      
+      onMarkAll: function(){
+        console.log("onMarkAll");
+      },
+      
+      removeCompletedItems: function(){
+        console.log("removeCompletedItems");
       }
     };
     
@@ -239,10 +202,14 @@ define([
       data: []
     });
     
-    var app = window.app = new App();
+    var app = window.app = new App({
+      el: '#todoapp'
+    });
     app
       .initialize()
       .render()
-      .setStore(todoStore);
+      .setStore(todoStore)
+      .applyBindings()
+    ;
     
 });
