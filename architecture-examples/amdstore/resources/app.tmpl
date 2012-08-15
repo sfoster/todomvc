@@ -21,7 +21,7 @@
 	    <input id="toggle-all" data-bind="click: onMarkAll" type="checkbox">
 	    <label for="toggle-all">Mark all as complete</label>
       <ul id="todo-list" data-bind="foreach: todos">
-          <li data-itemid="attr: id, text: title"></li>
+          <li data-bind="text: title"></li>
 	    </ul>
 	</section>
 

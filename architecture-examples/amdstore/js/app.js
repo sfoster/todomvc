@@ -1,6 +1,6 @@
 define([
-  "dollar", "util", "store/LocalStorage", "store/Observable", "knockout", "text!../resources/app.tmpl", "text!../resources/item.tmpl"
-], function($, util, Store, StoreObservable, ko, mainTemplate, itemTemplate) {
+  "dollar", "util", "store/LocalStorage", "store/Observable", "store/lib/Promise", "knockout", "text!../resources/app.tmpl", "text!../resources/item.tmpl"
+], function($, util, Store, StoreObservable, Promise, ko, mainTemplate, itemTemplate) {
 
     //  $(elements).delegate(selector, events, data, handler);  // jQuery 1.4.3+
     //  $(elements).on(events, selector, data, handler);        // jQuery 1.7+
@@ -97,36 +97,35 @@ define([
         return this;
       },
       setStore: function(store){
-        store = this.store = StoreObservable(store);
         var self = this;
-        var rows = this.todos = [{ id: 'item0', title: 'First Todo'}, { id: 'item1', title: '2nd Todo'}];
-        return this;
-        //store.query(null);
-        // initial render, move/bind to view
+        store = this.store = store; // StoreObservable(
         
-        //  watch for changes to the store that match our query
-        rows.observe(function(item, removedFrom, insertedInto){
-          var changes = self.onResultsChange.apply(self, arguments);
-          var options = {
-            from: removedFrom > -1 ? removedFrom : undefined,
-            to: insertedInto > -1 ? insertedInto : undefined
-          };
-          
-          self.listView.render( changes.map(decorateWithIndex), options );
-
-        }, true);
-        console.log("in setStore, mapping rows, ", rows.length);
-        rows.map(decorateWithIndex).map(function(item, idx){
-          console.log("calling render with item: ", item, idx);
-          self.listView.add(item);
+        var todos = this._todos = ko.observableArray([]);
+        
+        // the todos array is a computed value, delegating to an observable array
+        this.todos = ko.computed(function(){
+          console.log("computing the todos property");
+          return self.fetchTodos(todos);
         });
         return this;
+      },
+      fetchTodos: function(rows){
+        var self = this;
+        
+        // we return the observable array, but call splice on it with the results when the come back
+        // as its observable, it should result in updates to all listeners
+        Promise.when(this.store.query({ type: 'todo' }), function(results){
+          console.log("query callback, got results: ", results);
+          rows.splice.apply(rows, [0, rows.length].concat(results) );
+        });
+
+        return rows; 
       },
       onKeyPress: function(viewmodel, evt){
         var self = this;
         if(evt.which == 13) {
           console.log("adding new store item: ", evt.target.value);
-          self.store.add({ title: evt.target.value });
+          self.store.add({ title: evt.target.value, type: 'todo' });
           evt.target.value = '';
         }
         return true; // allow default action
@@ -199,7 +198,11 @@ define([
     
     var todoStore = new Store({
       // config store
-      data: []
+      data: [
+        { id: 'item0', title: 'First Todo', type: 'todo' }, 
+        { id: 'item1', title: '2nd Todo', type: 'todo' },
+        { id: 'item3', title: 'Not a  Todo', type: 'foo' }
+      ]
     });
     
     var app = window.app = new App({
