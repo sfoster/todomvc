@@ -20,15 +20,21 @@
     <section id="main">
 	    <input id="toggle-all" data-bind="click: onMarkAll" type="checkbox">
 	    <label for="toggle-all">Mark all as complete</label>
+	    
       <ul id="todo-list" data-bind="foreach: todos">
-          <li data-bind="text: title"></li>
+        <li>
+          <input class="toggle" type="checkbox" data-bind="attr: { checked: completed }"/>
+          <label data-bind="text: title"></label>
+          <button class="destroy"></button>
+        	<!-- input class="edit" type="text" value="<%= title %>" /-->
+        </li>
 	    </ul>
 	</section>
 
     <footer id="footer" data-attach-point="todo_stats">
         <span id="todo-count">
             <strong>
-                <span data-bind="text: todos.total" class="number"></span>
+                <span data-bind="text: _todos().length" class="number"></span>
             </strong>
             <span class="word">item<span class="plural">s</span></span> left.
         </span>

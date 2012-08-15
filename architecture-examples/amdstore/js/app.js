@@ -107,6 +107,7 @@ define([
           console.log("computing the todos property");
           return self.fetchTodos(todos);
         });
+
         return this;
       },
       fetchTodos: function(rows){
@@ -199,9 +200,9 @@ define([
     var todoStore = new Store({
       // config store
       data: [
-        { id: 'item0', title: 'First Todo', type: 'todo' }, 
-        { id: 'item1', title: '2nd Todo', type: 'todo' },
-        { id: 'item3', title: 'Not a  Todo', type: 'foo' }
+        { id: 'item0', title: 'First Todo', completed: false, type: 'todo' }, 
+        { id: 'item1', title: '2nd Todo', completed: false, type: 'todo' },
+        { id: 'item3', title: 'Not a  Todo', completed: false, type: 'foo' }
       ]
     });
     
